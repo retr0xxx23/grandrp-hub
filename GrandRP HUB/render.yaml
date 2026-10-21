@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: grandrp-hub
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22.11.0"
+      # Optional: point at a MongoDB Atlas free cluster for persistent storage.
+      # Leave unset to fall back to a JSON file on disk (ephemeral on Render free).
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB
+        value: grandrp_hub

@@ -1,0 +1,5 @@
+# The legislation PDFs live on an existing host and are far too large to bundle.
+/Legislation/*  https://grp.trixterpro.in/Legislation/:splat  200
+
+# Single page app shell.
+/*  /index.html  200

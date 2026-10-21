@@ -1,0 +1,19 @@
+{
+  "name": "grandrp-hub",
+  "version": "2.2.0",
+  "private": true,
+  "description": "GrandRP HUB - tactical command reference and law enforcement utilities for San Andreas.",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "preview": "node tools/preview-server.js . 8080"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "mongodb": "^6.12.0"
+  }
+}
