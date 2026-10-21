@@ -21,7 +21,7 @@ const OFFLINE_AFTER_MS = 60 * 1000;
 const MAX_MESSAGES = 500;
 const MAX_AUDIT_LOGS = 300;
 const MAX_PHOTOS = 200;
-const MAX_TELEMETRY = 200;
+const MAX_TELEMETRY = 100;
 
 const app = express();
 app.disable('x-powered-by');
@@ -181,6 +181,7 @@ api.post('/chat/message', async (req, res) => {
   };
 
   await store.put('messages', message);
+  await store.prune('messages', MAX_MESSAGES);
   broadcast('new-chat-message', { message });
   res.json({ success: true, message });
 });
@@ -200,6 +201,7 @@ api.delete('/chat/message/:id', async (req, res) => {
     timestamp: Date.now(),
   };
   await store.put('auditLogs', auditEntry);
+  await store.prune('auditLogs', MAX_AUDIT_LOGS);
   broadcast('delete-chat-message', { messageId: req.params.id, auditEntry });
   res.json({ success: true, auditEntry });
 });
@@ -247,6 +249,7 @@ api.post('/photos', async (req, res) => {
   };
 
   await store.put('photos', photo);
+  await store.prune('photos', MAX_PHOTOS);
   broadcast('new-photo', { photo });
   res.json({ success: true, photo });
 });
@@ -280,6 +283,7 @@ api.post('/photos/:id/like', async (req, res) => {
   photo.likedBy = likedBy;
   photo.likes = likedBy.length;
   await store.put('photos', photo);
+  await store.prune('photos', MAX_PHOTOS);
 
   broadcast('photo-like', { photoId: photo.id, likes: photo.likes, likedBy: photo.likedBy });
   res.json({ success: true, likes: photo.likes, likedBy: photo.likedBy });
@@ -338,6 +342,7 @@ api.post('/telemetry/log', async (req, res) => {
     timestamp: Date.now(),
   };
   await store.put('telemetry', entry);
+  await store.prune('telemetry', MAX_TELEMETRY);
   res.json({ success: true });
 });
 

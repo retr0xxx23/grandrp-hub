@@ -16,6 +16,7 @@
  *   get(collection,id)-> document | null
  *   put(collection,doc)-> upsert, returns the stored document
  *   remove(collection,id) -> boolean
+ *   prune(collection,max) -> keeps the newest `max` documents
  */
 
 const fs = require('fs');
@@ -109,6 +110,16 @@ class FileStore {
     return true;
   }
 
+  async prune(collection, max) {
+    const list = this.state[collection];
+    if (!Array.isArray(list) || list.length <= max) return 0;
+    list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    const removed = list.length - max;
+    this.state[collection] = list.slice(0, max);
+    this.schedule();
+    return removed;
+  }
+
   schedule() {
     if (!this.file || this._writeTimer) return;
     this._writeTimer = setTimeout(() => {
@@ -171,6 +182,14 @@ class MongoStore {
     return result.deletedCount > 0;
   }
 
+  async prune(collection, max) {
+    const docs = await this.col(collection).find({}).sort({ timestamp: -1 }).toArray();
+    if (docs.length <= max) return 0;
+    const stale = docs.slice(max).map((doc) => doc.id);
+    const result = await this.col(collection).deleteMany({ id: { $in: stale } });
+    return result.deletedCount || 0;
+  }
+
   async close() {
     if (this.client) await this.client.close();
   }
@@ -190,4 +209,4 @@ async function createStore() {
   return store;
 }
 
-module.exports = { createStore, COLLECTIONS };
+module.exports = { createStore, FileStore, MongoStore, COLLECTIONS };

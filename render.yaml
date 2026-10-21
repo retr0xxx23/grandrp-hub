@@ -1,16 +1,13 @@
 services:
   - type: web
     name: grandrp-hub
-    runtime: node
-    rootDir: GrandRP HUB
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     plan: free
-    buildCommand: npm install
-    startCommand: npm start
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:
-      - key: NODE_VERSION
-        value: "22.11.0"
       # Optional: a MongoDB Atlas free cluster keeps chat and photos across
       # restarts. Leave unset to use the JSON file on disk (ephemeral on the free plan).
       - key: MONGODB_URI
