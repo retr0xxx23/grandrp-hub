@@ -27,15 +27,6 @@
     <link rel="icon" type="image/png" href="Assets/logo.png" />
     <link rel="manifest" href="manifest.json" />
     <link rel="stylesheet" href="css/style.css" />
-    <script>
-      // Base URL that serves the legislation PDFs.
-      // The default points at the host that already serves the PDFs, so the
-      // legislation viewer works on every deployment including static ones.
-      // Set this to "/Legislation" to serve them from the app's own host
-      // (the bundled server serves that folder and proxies upstream if the
-      // PDF is not present locally).
-      window.GRP_LEGISLATION_BASE = 'https://grp.trixterpro.in/Legislation';
-    </script>
   </head>
   <body>
     <div id="app"></div>
@@ -46,6 +37,7 @@
     <div id="officers-roster-modal-container"></div>
     <div id="toast-container" class="toast-container"></div>
 
+    <script src="js/static-api.js"></script>
     <script type="module" src="js/data.js"></script>
     <script type="module" src="js/penal-codes.js"></script>
     <script type="module" src="js/calculator.js"></script>

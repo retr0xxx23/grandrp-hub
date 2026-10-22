@@ -1,6 +1,7 @@
 *.rar
 node_modules/
 data/
+_site/
 .env
 .env.*
 *.log

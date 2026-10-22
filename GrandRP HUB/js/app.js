@@ -917,9 +917,16 @@ export function copyToClipboard(text, customToast) {
 function getRoute() {
   const hash = window.location.hash.replace(/^#\/?/, '') || '';
   if (hash) return '/' + hash;
-  const path = window.location.pathname.replace(/\/+$/, '') || '/';
+
+  // Strip the deployment base path (for example /grandrp-hub/) so direct
+  // visits to a GitHub Pages project URL resolve to the home route.
+  let path = window.location.pathname;
+  const basePath = new URL('.', document.baseURI).pathname.replace(/\/+$/, '');
+  if (basePath && path.startsWith(basePath)) path = path.slice(basePath.length);
+
+  path = path.replace(/\/+$/, '');
   if (path === '' || path === '/index.html') return '/';
-  return path;
+  return path.startsWith('/') ? path : '/' + path;
 }
 
 export function navigate(path) {
@@ -1262,7 +1269,7 @@ function handleDeletedChatMessage(messageId, auditEntry) {
     setTimeout(() => el.remove(), 250);
   }
 
-  if (auditEntry) {
+  if (auditEntry && !chatState.auditLogs.some(log => log.id === auditEntry.id)) {
     chatState.auditLogs.unshift(auditEntry);
     if (chatState.auditLogs.length > 300) chatState.auditLogs = chatState.auditLogs.slice(0, 300);
     updateChatBadgeDOM();
@@ -1520,7 +1527,7 @@ function handleDeleteChatMessageAction(msgId) {
   })
     .then(r => r.json())
     .then(data => {
-      if (data.auditEntry) {
+      if (data.auditEntry && !chatState.auditLogs.some(log => log.id === data.auditEntry.id)) {
         chatState.auditLogs.unshift(data.auditEntry);
         updateChatBadgeDOM();
       }
@@ -4741,15 +4748,14 @@ Defense Lawyer: ${defense}`;
 }
 
 function renderLegislationPage() {
-  const legislationBase = (typeof window !== 'undefined' && window.GRP_LEGISLATION_BASE) || '/Legislation';
   const fallbackFiles = [
-    { name: "Firearm Law of the State of San Andreas", filename: "Firearm Law of the State of San Andreas.pdf", file: "Firearm Law of the State of San Andreas.pdf", size: 3314014 },
-    { name: "Government Agencies Transfer Act", filename: "Government Agencies Transfer Act.pdf", file: "Government Agencies Transfer Act.pdf", size: 21561721 },
-    { name: "Penal Codes of the State of San Andreas", filename: "Penal Codes of the State of San Andreas.pdf", file: "Penal Codes of the State of San Andreas.pdf", size: 40232921 },
-    { name: "Procedures Of Detention And Arrest Code 3rd Rendition", filename: "Procedures Of Detention And Arrest Code.pdf", file: "Procedures Of Detention And Arrest Code 3rd Rendition.pdf", size: 20415666 },
-    { name: "Public Servants Governance Act 8th Rendition", filename: "Public Servants Governance Act.pdf", file: "Public Servants Governance Act 8th Rendition.pdf", size: 127883331 },
-    { name: "Traffic Code of the State of San Andreas 1st Rendition", filename: "Traffic Code of the State of San Andreas.pdf", file: "Traffic Code of the State of San Andreas 1st Rendition.pdf", size: 15368056 }
-  ].map((file) => ({ ...file, url: `${legislationBase}/${encodeURIComponent(file.file)}` }));
+    { name: "Firearm Law of the State of San Andreas", filename: "Firearm Law of the State of San Andreas.pdf", path: "Firearm Law.pdf", url: "https://grp.trixterpro.in/Legislation/Firearm%20Law%20of%20the%20State%20of%20San%20Andreas.pdf", size: 3314014 },
+    { name: "Government Agencies Transfer Act", filename: "Government Agencies Transfer Act.pdf", path: "Agencies Transfer Act.pdf", url: "https://grp.trixterpro.in/Legislation/Government%20Agencies%20Transfer%20Act.pdf", size: 21561721 },
+    { name: "Penal Codes of the State of San Andreas", filename: "Penal Codes of the State of San Andreas.pdf", path: "Penal Codes.pdf", url: "https://grp.trixterpro.in/Legislation/Penal%20Codes%20of%20the%20State%20of%20San%20Andreas.pdf", size: 40232921 },
+    { name: "Procedures Of Detention And Arrest Code 3rd Rendition", filename: "Procedures Of Detention And Arrest Code.pdf", path: "Detention & Arrest.pdf", url: "https://grp.trixterpro.in/Legislation/Procedures%20Of%20Detention%20And%20Arrest%20Code%203rd%20Rendition.pdf", size: 20415666 },
+    { name: "Public Servants Governance Act 8th Rendition", filename: "Public Servants Governance Act.pdf", path: "Governance Act.pdf", url: "https://grp.trixterpro.in/Legislation/Public%20Servants%20Governance%20Act%208th%20Rendition.pdf", size: 127883331 },
+    { name: "Traffic Code of the State of San Andreas 1st Rendition", filename: "Traffic Code of the State of San Andreas.pdf", path: "Traffic Code.pdf", url: "https://grp.trixterpro.in/Legislation/Traffic%20Code%20of%20the%20State%20of%20San%20Andreas%201st%20Rendition.pdf", size: 15368056 }
+  ];
 
   const content = `
     <div class="legislation-page">

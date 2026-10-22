@@ -6,27 +6,14 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait-primary",
   "background_color": "#090e17",
   "theme_color": "#090e17",
   "icons": [
     {
-      "src": "Assets/grp.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
       "src": "Assets/logo.png",
       "sizes": "1024x1024",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "Assets/logo.png",
-      "sizes": "1024x1024",
-      "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ]
 }

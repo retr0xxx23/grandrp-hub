@@ -2,7 +2,7 @@ name: Deploy static site to GitHub Pages
 
 on:
   push:
-    branches: [master]
+    branches: [master, main]
   workflow_dispatch:
 
 permissions:
@@ -21,23 +21,27 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Assemble static site
         run: |
           mkdir -p _site
-          cp -r "GrandRP HUB/." _site/
-          rm -rf _site/server _site/tools _site/node_modules _site/data
-          rm -f _site/package.json _site/package-lock.json _site/Dockerfile
-          rm -f _site/render.yaml _site/_headers _site/_redirects _site/.gitignore
-          rm -f _site/.dockerignore
+          cp -R "GrandRP HUB"/. _site/
+          rm -rf _site/tools _site/server _site/node_modules
+          rm -f _site/preview.bat _site/package.json _site/package-lock.json
+          rm -f _site/Dockerfile _site/render.yaml _site/_headers _site/_redirects
+          rm -f _site/README.md _site/.dockerignore _site/.gitignore
           touch _site/.nojekyll
 
-      - uses: actions/configure-pages@v5
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
         with:
           path: _site
 
-      - id: deployment
+      - name: Deploy
+        id: deployment
         uses: actions/deploy-pages@v4
